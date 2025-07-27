@@ -81,6 +81,13 @@
             box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
         }
 
+        .toggles-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
         .toggle-container {
             display: flex;
             align-items: center;
@@ -317,18 +324,33 @@
                         >
                     </div>
                 </div>
-                <div class="toggle-container">
-                    <label class="react-toggle" id="thirteenthToggle" role="switch" aria-checked="false">
-                        <div class="react-toggle-track"></div>
-                        <div class="react-toggle-thumb"></div>
-                        <input 
-                            class="react-toggle-screenreader-only" 
-                            type="checkbox" 
-                            id="thirteenthCheckbox"
-                            aria-label="Include 13th month salary"
-                        >
-                    </label>
-                    <span>13th Month Salary</span>
+                <div class="toggles-container">
+                    <div class="toggle-container">
+                        <label class="react-toggle" id="thirteenthToggle" role="switch" aria-checked="false">
+                            <div class="react-toggle-track"></div>
+                            <div class="react-toggle-thumb"></div>
+                            <input 
+                                class="react-toggle-screenreader-only" 
+                                type="checkbox" 
+                                id="thirteenthCheckbox"
+                                aria-label="Include 13th month salary"
+                            >
+                        </label>
+                        <span>13th Month Salary</span>
+                    </div>
+                    <div class="toggle-container">
+                        <label class="react-toggle" id="ataToggle" role="switch" aria-checked="false">
+                            <div class="react-toggle-track"></div>
+                            <div class="react-toggle-thumb"></div>
+                            <input 
+                                class="react-toggle-screenreader-only" 
+                                type="checkbox" 
+                                id="ataCheckbox"
+                                aria-label="Include ATA"
+                            >
+                        </label>
+                        <span>Include ATA</span>
+                    </div>
                 </div>
             </div>
 
@@ -340,6 +362,10 @@
                         <div class="result-item">
                             <span class="result-label">Gross Salary</span>
                             <span class="result-value" id="annualGross">€30,000.00</span>
+                        </div>
+                        <div class="result-item" id="annualAtaRow" style="display: none;">
+                            <span class="result-label">ATA</span>
+                            <span class="result-value" id="annualAta">€0.00</span>
                         </div>
                         <div class="result-item">
                             <span class="result-label">Income Tax</span>
@@ -363,6 +389,10 @@
                         <div class="result-item">
                             <span class="result-label">Gross Salary</span>
                             <span class="result-value" id="monthlyGross">€2,500.00</span>
+                        </div>
+                        <div class="result-item" id="monthlyAtaRow" style="display: none;">
+                            <span class="result-label">ATA</span>
+                            <span class="result-value" id="monthlyAta">€0.00</span>
                         </div>
                         <div class="result-item">
                             <span class="result-label">Income Tax</span>
@@ -436,12 +466,15 @@
         const SOCIAL_INSURANCE_RATE = 8.9; // %
         const SOCIAL_INSURANCE_MONTHLY_CAP = 5551; // € (2025)
 
+        const ATA_RATE = 1.25; // %
+
         // Application state
         class TaxCalculator {
             constructor() {
                 this.salaryAmount = 30000;
                 this.isAnnual = true;
                 this.hasThirteenthMonth = false;
+                this.hasAta = false;
                 this.initializeEventListeners();
                 this.calculate();
             }
@@ -474,6 +507,19 @@
                     this.toggleThirteenthMonth();
                 });
 
+                // ATA toggle
+                const ataToggle = document.getElementById('ataToggle');
+                const ataCheckbox = document.getElementById('ataCheckbox');
+                
+                ataToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleAta();
+                });
+
+                ataCheckbox.addEventListener('change', () => {
+                    this.toggleAta();
+                });
+
                 // Tax breakdown toggle
                 const taxBreakdownToggle = document.getElementById('taxBreakdownToggle');
                 taxBreakdownToggle.addEventListener('click', () => {
@@ -488,6 +534,25 @@
                 const checkbox = document.getElementById('thirteenthCheckbox');
                 
                 if (this.hasThirteenthMonth) {
+                    toggle.classList.add('react-toggle--checked');
+                    toggle.setAttribute('aria-checked', 'true');
+                    checkbox.checked = true;
+                } else {
+                    toggle.classList.remove('react-toggle--checked');
+                    toggle.setAttribute('aria-checked', 'false');
+                    checkbox.checked = false;
+                }
+                
+                this.calculate();
+            }
+
+            toggleAta() {
+                this.hasAta = !this.hasAta;
+                
+                const toggle = document.getElementById('ataToggle');
+                const checkbox = document.getElementById('ataCheckbox');
+                
+                if (this.hasAta) {
                     toggle.classList.add('react-toggle--checked');
                     toggle.setAttribute('aria-checked', 'true');
                     checkbox.checked = true;
@@ -548,32 +613,54 @@
                 return (cappedSalary * GESY_RATE) / 100;
             }
 
+            calculateAta(annualSalary) {
+                return (annualSalary * ATA_RATE) / 100;
+            }
+
             calculate() {
 				let months = this.hasThirteenthMonth ? 13 : 12;
                 // Convert to annual salary
                 let annualSalary = this.isAnnual ? this.salaryAmount : this.salaryAmount * months;
+				const ataAmount = this.hasAta ? this.calculateAta(annualSalary) : 0;
+				
+				let effectiveAnnualSalary = annualSalary + ataAmount;
 
                 // Calculate deductions
-                const taxResult = this.calculateTax(annualSalary);
-                const socialInsuranceAmount = this.calculateSocialInsurance(annualSalary);
-                const gesyAmount = this.calculateGesy(annualSalary);
+                const taxResult = this.calculateTax(effectiveAnnualSalary);
+                const socialInsuranceAmount = this.calculateSocialInsurance(effectiveAnnualSalary);
+                const gesyAmount = this.calculateGesy(effectiveAnnualSalary);
+                
                 
                 // Calculate net
                 const totalDeductions = taxResult.totalTax + socialInsuranceAmount + gesyAmount;
-                const annualNet = annualSalary - totalDeductions;
+                const annualNet = effectiveAnnualSalary - totalDeductions;
                 
                 // Update display
-                this.updateResults(annualSalary, taxResult.totalTax, socialInsuranceAmount, gesyAmount, annualNet, months);
+                this.updateResults(annualSalary, taxResult.totalTax, socialInsuranceAmount, gesyAmount, ataAmount, annualNet, months);
                 this.updateTaxBreakdown(taxResult.taxBreakdown);
             }
 
-            updateResults(annualGross, annualTax, annualSocial, annualGesy, annualNet, months) {
+            updateResults(annualGross, annualTax, annualSocial, annualGesy, annualAta, annualNet, months) {
                 // Annual values
                 document.getElementById('annualGross').textContent = this.formatCurrency(annualGross);
                 document.getElementById('annualTax').textContent = this.formatCurrency(annualTax);
                 document.getElementById('annualSocial').textContent = this.formatCurrency(annualSocial);
                 document.getElementById('annualGesy').textContent = this.formatCurrency(annualGesy);
                 document.getElementById('annualNet').textContent = this.formatCurrency(annualNet);
+                
+                // ATA display logic
+                const annualAtaRow = document.getElementById('annualAtaRow');
+                const monthlyAtaRow = document.getElementById('monthlyAtaRow');
+                
+                if (this.hasAta) {
+                    document.getElementById('annualAta').textContent = this.formatCurrency(annualAta);
+                    document.getElementById('monthlyAta').textContent = this.formatCurrency(annualAta / months);
+                    annualAtaRow.style.display = 'flex';
+                    monthlyAtaRow.style.display = 'flex';
+                } else {
+                    annualAtaRow.style.display = 'none';
+                    monthlyAtaRow.style.display = 'none';
+                }
                 
                 // Monthly values
                 document.getElementById('monthlyGross').textContent = this.formatCurrency(annualGross / months);
