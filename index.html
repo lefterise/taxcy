@@ -549,30 +549,25 @@
             }
 
             calculate() {
+				let months = this.hasThirteenthMonth ? 13 : 12;
                 // Convert to annual salary
-                let baseAnnualSalary = this.isAnnual ? this.salaryAmount : this.salaryAmount * 12;
-                
-                // Add 13th month if enabled
-                let effectiveAnnualSalary = baseAnnualSalary;
-                if (this.hasThirteenthMonth) {
-                    effectiveAnnualSalary = baseAnnualSalary * (13/12);
-                }
-                
+                let annualSalary = this.isAnnual ? this.salaryAmount : this.salaryAmount * months;
+
                 // Calculate deductions
-                const taxResult = this.calculateTax(effectiveAnnualSalary);
-                const socialInsuranceAmount = this.calculateSocialInsurance(effectiveAnnualSalary);
-                const gesyAmount = this.calculateGesy(effectiveAnnualSalary);
+                const taxResult = this.calculateTax(annualSalary);
+                const socialInsuranceAmount = this.calculateSocialInsurance(annualSalary);
+                const gesyAmount = this.calculateGesy(annualSalary);
                 
                 // Calculate net
                 const totalDeductions = taxResult.totalTax + socialInsuranceAmount + gesyAmount;
-                const annualNet = effectiveAnnualSalary - totalDeductions;
+                const annualNet = annualSalary - totalDeductions;
                 
                 // Update display
-                this.updateResults(effectiveAnnualSalary, taxResult.totalTax, socialInsuranceAmount, gesyAmount, annualNet);
+                this.updateResults(annualSalary, taxResult.totalTax, socialInsuranceAmount, gesyAmount, annualNet, months);
                 this.updateTaxBreakdown(taxResult.taxBreakdown);
             }
 
-            updateResults(annualGross, annualTax, annualSocial, annualGesy, annualNet) {
+            updateResults(annualGross, annualTax, annualSocial, annualGesy, annualNet, months) {
                 // Annual values
                 document.getElementById('annualGross').textContent = this.formatCurrency(annualGross);
                 document.getElementById('annualTax').textContent = this.formatCurrency(annualTax);
@@ -581,11 +576,11 @@
                 document.getElementById('annualNet').textContent = this.formatCurrency(annualNet);
                 
                 // Monthly values
-                document.getElementById('monthlyGross').textContent = this.formatCurrency(annualGross / 12);
-                document.getElementById('monthlyTax').textContent = this.formatCurrency(annualTax / 12);
-                document.getElementById('monthlySocial').textContent = this.formatCurrency(annualSocial / 12);
-                document.getElementById('monthlyGesy').textContent = this.formatCurrency(annualGesy / 12);
-                document.getElementById('monthlyNet').textContent = this.formatCurrency(annualNet / 12);
+                document.getElementById('monthlyGross').textContent = this.formatCurrency(annualGross / months);
+                document.getElementById('monthlyTax').textContent = this.formatCurrency(annualTax / months);
+                document.getElementById('monthlySocial').textContent = this.formatCurrency(annualSocial / months);
+                document.getElementById('monthlyGesy').textContent = this.formatCurrency(annualGesy / months);
+                document.getElementById('monthlyNet').textContent = this.formatCurrency(annualNet / months);
             }
 
             updateTaxBreakdown(taxBreakdown) {
