@@ -98,28 +98,75 @@
                     </div>
                 </div>
             </div>
-            <div class="tax-deductions-section">
-                <h3 class="deductions-title">Tax Deductions (Optional)</h3>
-                <div class="deductions-grid">
-                    <div class="deduction-item">
-                        <label for="householdIncome">Household Income (€)</label>
-                        <input type="number" id="householdIncome" placeholder="0" min="0" step="100">
-                    </div>                   
-                    <div class="deduction-item">
-                        <label for="checkbox-label">&nbsp;</label>
-                        <label class="checkbox-label"><input type="checkbox" id="hasSpouse"><span>Has Spouse</span></label>
+
+            <div id="deductions-container" class="tax-breakdown">
+                <h2 id="deductionsToggle">Deductions<span class="caret"></span></h2>
+                <div id="deductionsContent" style="display: none;">                
+                    <div class="tax-deductions-section">
+                        <h3 class="deductions-title">Donation Deductions</h3>
+                        <div class="deductions-grid">
+                            <div class="deduction-item">
+                                <label for="donations">Donations (€)</label>
+                                <input type="number" id="donations" placeholder="0" min="0" step="100">
+                            </div>
+                        </div>
+                    </div>            
+                    <div class="tax-deductions-section">
+                        <h3 class="deductions-title">Family Deductions</h3>
+                        <div class="deductions-grid">
+                            <div class="deduction-item">
+                                <label for="householdIncome">Household Income (€)</label>
+                                <input type="number" id="householdIncome" placeholder="0" min="0" step="100">
+                            </div>                   
+                            <div class="deduction-item">
+                                <label for="checkbox-label">&nbsp;</label>
+                                <label class="checkbox-label"><input type="checkbox" id="hasSpouse"><span>Has Spouse</span></label>
+                            </div>
+                            <div class="deduction-item">
+                                <label for="numChildren">Number of Children under 25</label>
+                                <input type="number" id="numChildren" placeholder="0" min="0" max="20" step="1">
+                            </div>
+                            <div class="deduction-item">
+                                <label for="loanInterest">Loan Interest Paid (€)</label>
+                                <input type="number" id="loanInterest" placeholder="0" min="0" step="100">
+                            </div>
+                        </div>
+                        <div id="deductionInfo" class="deduction-info"></div>
                     </div>
-                    <div class="deduction-item">
-                        <label for="numChildren">Number of Children under 25</label>
-                        <input type="number" id="numChildren" placeholder="0" min="0" max="20" step="1">
+                    <div class="tax-deductions-section">
+                        <h3 class="deductions-title">Life Insurance Deductions</h3>
+                        <div class="deductions-grid">
+                            <div class="deduction-item">
+                                <label for="lifeInsurancePremium">Life Insurance Premium (€)</label>
+                                <input type="number" id="lifeInsurancePremium" placeholder="0" min="0" step="100">
+                            </div>
+                            <div class="deduction-item">
+                                <label for="lifeInsuranceAmount">Life Insurance Amount (€)</label>
+                                <input type="number" id="lifeInsuranceAmount" placeholder="0" min="0" step="100">
+                            </div>
+                        </div>
                     </div>
-                    <div class="deduction-item">
-                        <label for="loanInterest">Loan Interest Paid (€)</label>
-                        <input type="number" id="loanInterest" placeholder="0" min="0" step="100">
+                    <div class="tax-deductions-section">
+                        <h3 class="deductions-title">Private Medical Fund Deductions</h3>
+                        <div class="deductions-grid">
+                            <div class="deduction-item">
+                                <label for="privateMedicalFundContributions">Private Medical Fund Contributions (€)</label>
+                                <input type="number" id="privateMedicalFundContributions" placeholder="0" min="0" step="100">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tax-deductions-section">
+                        <h3 class="deductions-title">Pension & Provident Fund Deductions</h3>
+                        <div class="deductions-grid">
+                            <div class="deduction-item">
+                                <label for="providentFund">Provident Fund Contributions (€)</label>
+                                <input type="number" id="providentFund" placeholder="0" min="0" step="100">
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div id="deductionInfo" class="deduction-info"></div>
             </div>
+            
             <div class="results-container">
                 <div class="results-grid">
                     <div class="results-column">
@@ -168,7 +215,10 @@
               GESY_YEARLY_CAP = 180000,
               SOCIAL_INSURANCE_RATE = 8.9,
               SOCIAL_INSURANCE_MONTHLY_CAP = 5551,
-              ATA_RATE = 1.25;
+              ATA_RATE = 1.25,
+              LIFE_INSURANCE_CAP_PERCENT = 7,
+              PRIVATE_MEDICAL_FUND_PERCENT = 2,
+              PROVIDENT_FUND_PERCENT = 10;
 
         class TaxCalculator {
             constructor() {
@@ -180,6 +230,12 @@
                 this.loanInterest = 0;
                 this.hasSpouse = false;
                 this.numChildren = 0;
+                this.donations = 0;
+                this.lifeInsurancePremium = 0;
+                this.lifeInsuranceAmount = 0;
+                this.privateMedicalFundContributions = 0;
+                this.providentFund = 0;
+                
                 this.initializeEventListeners();
                 this.calculate()
             }
@@ -213,7 +269,32 @@
                 $('numChildren').addEventListener('input', e => {
                     this.numChildren = parseInt(e.target.value) || 0;
                     this.calculate()
-                })
+                });
+
+                $('donations').addEventListener('input', e => {
+                    this.donations = parseFloat(e.target.value) || 0;
+                    this.calculate()
+                });
+
+                $('lifeInsurancePremium').addEventListener('input', e => {
+                    this.lifeInsurancePremium = parseFloat(e.target.value) || 0;
+                    this.calculate()
+                });
+
+                $('lifeInsuranceAmount').addEventListener('input', e => {
+                    this.lifeInsuranceAmount = parseFloat(e.target.value) || 0;
+                    this.calculate()
+                });
+
+                $('privateMedicalFundContributions').addEventListener('input', e => {
+                    this.privateMedicalFundContributions = parseFloat(e.target.value) || 0;
+                    this.calculate()
+                });
+
+                $('providentFund').addEventListener('input', e => {
+                    this.providentFund = parseFloat(e.target.value) || 0;
+                    this.calculate()
+                });
 
                 $('thirteenthToggle').addEventListener('click', e => {
                     e.preventDefault();
@@ -229,8 +310,9 @@
 
                 $('ataCheckbox').addEventListener('change', () => this.toggleAta());
                 
-                $('taxBreakdownToggle').addEventListener('click', () => this.toggleTaxBreakdown());
+                $('taxBreakdownToggle').addEventListener('click', () => this.toggleCollapsableSection($('taxBreakdownToggle'), $('taxBreakdownContent')));
 
+                $('deductionsToggle').addEventListener('click', () => this.toggleCollapsableSection($('deductionsToggle'), $('deductionsContent')));
             }
 
             renderToggle(toggleEl, checkboxEl, value) {
@@ -251,9 +333,8 @@
                 this.calculate()
             }
 
-            toggleTaxBreakdown() {
-                const content = $('taxBreakdownContent'),
-                      caret = document.querySelector('.caret');
+            toggleCollapsableSection(section, content) {
+                const caret = section.querySelector('.caret');
 
                 if (content.style.display === 'none') {
                     content.style.display = 'block';
@@ -313,7 +394,7 @@
                     || (this.numChildren >= 5                          && income <= 200000);                
             }
 
-            calculateTaxDeductions() {
+            calculateFamilyTaxDeductions() {
                 if (!this.isEligibleForDeductions()) return {
                     total: 0,
                     loanInterest: 0,
@@ -343,23 +424,28 @@
 				
 				let effectiveAnnualSalary = annualSalary + ataAmount;
 
-                const d = this.calculateTaxDeductions();
-                const taxableIncome = Math.max(0, effectiveAnnualSalary - d.total);
+                const familyDeductions = this.calculateFamilyTaxDeductions();
+                const lifeInsuranceDeductions = Math.min(this.lifeInsurancePremium, this.lifeInsuranceAmount * LIFE_INSURANCE_CAP_PERCENT / 100);
+                const privateMedicalFundDeductions =  Math.min(this.privateMedicalFundContributions, effectiveAnnualSalary * PRIVATE_MEDICAL_FUND_PERCENT / 100);
+                const providentFundDeductions =  Math.min(this.providentFund, effectiveAnnualSalary * PROVIDENT_FUND_PERCENT / 100);
+                const socialInsuranceAmount = this.calculateSocialInsurance(effectiveAnnualSalary);
+                const gesyAmount = this.calculateGesy(effectiveAnnualSalary);
+
+                const netTotalIncome = Math.max(0, effectiveAnnualSalary - this.donations - familyDeductions.total);
+                const contributionsDeductions = Math.min(socialInsuranceAmount + gesyAmount + lifeInsuranceDeductions + privateMedicalFundDeductions + providentFundDeductions, netTotalIncome / 5);
+                
+                const taxableIncome = netTotalIncome - contributionsDeductions;
 
                 // Calculate deductions
                 const taxResult = this.calculateTax(taxableIncome);
-                const socialInsuranceAmount = this.calculateSocialInsurance(effectiveAnnualSalary);
-                const gesyAmount = this.calculateGesy(effectiveAnnualSalary);
                 
-                
-                // Calculate net
-                const totalDeductions = taxResult.totalTax + socialInsuranceAmount + gesyAmount;
-                const annualNet = effectiveAnnualSalary - totalDeductions;
+                // Calculate net                
+                const annualNet = effectiveAnnualSalary - taxResult.totalTax - socialInsuranceAmount - gesyAmount;
                 
                 // Update display
                 this.updateResults(annualSalary, taxResult.totalTax, socialInsuranceAmount, gesyAmount, ataAmount, annualNet, months);
                 this.updateTaxBreakdown(taxResult.taxBreakdown);
-                this.updateDeductionInfo(d)
+                this.updateFamilyDeductionInfo(familyDeductions)
             }
 
             updateResults(annualGross, annualTax, annualSocial, annualGesy, annualAta, annualNet, months) {                
@@ -413,7 +499,7 @@
                 return '€' + a.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
             }
 
-            updateDeductionInfo(d) {
+            updateFamilyDeductionInfo(d) {
                 const i = $('deductionInfo');
                 if (!this.householdIncome && !this.loanInterest && !this.hasSpouse && this.numChildren === 0) {
                     i.innerHTML = '';
