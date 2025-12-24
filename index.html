@@ -5,576 +5,262 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cyprus Tax Calculator</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
+        * { box-sizing: border-box; }
         body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-                "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-                sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            margin: 0; padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
             background-color: #f8f9fa;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .calculator-wrapper {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        /* Salary Input Section */
-        .salary-input {
-            padding: 2em 1.5em 1.5em;
-            background: linear-gradient(135deg, #3dbaff 0%, #2196F3 100%);
-            color: white;
-        }
-
-        .input-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 1.5em;
-            flex-wrap: wrap;
-        }
-
-        .salary-type-container {
-            text-align: center;
-        }
-
-        .salary-type-container select {
-            padding: 0.4em 0.8em;
-            border: none;
-            border-radius: 4px;
-            background-color: rgba(255,255,255,0.2);
-            color: white;
-            font-size: 1em;
-            cursor: pointer;
-        }
-
-        .salary-type-container select option {
-            color: #333;
-        }
-
-        .salary-input-container input {
-            font-size: 1.4em;
-            padding: 0.5em 0.8em;
-            border: none;
-            border-radius: 4px;
-            width: 200px;
-            text-align: center;
-        }
-
-        .salary-input-container input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
-        }
-
-        .toggles-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        /* Toggle Switch Styles */
-        .react-toggle {
-            touch-action: pan-x;
-            display: inline-block;
-            position: relative;
-            cursor: pointer;
-            background-color: transparent;
-            border: 0;
-            padding: 0;
-            user-select: none;
-        }
-
-        .react-toggle-track {
-            width: 50px;
-            height: 24px;
-            padding: 0;
-            border-radius: 30px;
-            background-color: rgba(255,255,255,0.3);
-            transition: all 0.2s ease;
-        }
-
-        .react-toggle:hover:not(.react-toggle--disabled) .react-toggle-track {
-            background-color: rgba(255,255,255,0.4);
-        }
-
-        .react-toggle--checked .react-toggle-track {
-            background-color: #4CAF50;
-        }
-
-        .react-toggle--checked:hover:not(.react-toggle--disabled) .react-toggle-track {
-            background-color: #45a049;
-        }
-
-        .react-toggle-thumb {
-            position: absolute;
-            top: 1px;
-            left: 1px;
-            width: 22px;
-            height: 22px;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            background-color: #fafafa;
-            transition: all 0.25s ease;
-        }
-
-        .react-toggle--checked .react-toggle-thumb {
-            left: 27px;
-            border-color: #4CAF50;
-        }
-
-        .react-toggle-screenreader-only {
-            border: 0;
-            clip: rect(0 0 0 0);
-            height: 1px;
-            margin: -1px;
-            overflow: hidden;
-            padding: 0;
-            position: absolute;
-            width: 1px;
-        }
-
-        /* Results Section */
-        .results-container {
-            padding: 2em 1.5em;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        .results-column h2 {
-            font-size: 1.5rem;
-            margin: 0 0 1em 0;
-            color: #333;
-            border-bottom: 2px solid #3dbaff;
-            padding-bottom: 0.5em;
-        }
-
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .result-item:last-child {
-            border-bottom: 2px solid #3dbaff;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .result-label {
-            color: #666;
-            font-weight: 500;
-            text-transform: capitalize;
-        }
-
-        .result-value {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .result-item:last-child .result-value {
-            color: #2196F3;
-        }
-
-        /* Tax Breakdown Section */
-        .tax-breakdown {
-            padding: 1.5em;
-            background-color: #f8f9fa;
-            border-top: 1px solid #dee2e6;
-        }
-
-        .tax-breakdown h2 {
-            font-size: 1.4rem;
-            margin: 0 0 1em 0;
-            color: #333;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .caret {
-            display: inline-block;
-            width: 0;
-            height: 0;
-            border-top: 6px solid #666;
-            border-right: 6px solid transparent;
-            border-left: 6px solid transparent;
-            transition: transform 0.3s;
-        }
-
-        .caret.open {
-            transform: rotate(180deg);
-        }
-
-        .tax-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 4px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .tax-table th,
-        .tax-table td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .tax-table th {
-            background-color: #3dbaff;
-            color: white;
-            font-weight: 600;
-        }
-
-        .tax-table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        /* Responsive Design */
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .calculator-wrapper { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }
+        .salary-input { padding: 2em 1.5em 1.5em; background: linear-gradient(135deg, #3dbaff 0%, #2196F3 100%); color: white; }
+        .input-row { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 1.5em; flex-wrap: wrap; }
+        .salary-type-container { text-align: center; }
+        .salary-type-container select { padding: 0.4em 0.8em; border: none; border-radius: 4px; background-color: rgba(255,255,255,0.2); color: white; font-size: 1em; cursor: pointer; }
+        .salary-type-container select option { color: #333; }
+        .salary-input-container input { font-size: 1.4em; padding: 0.5em 0.8em; border: none; border-radius: 4px; width: 200px; text-align: center; }
+        .salary-input-container input:focus { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.3); }
+        .toggles-container { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .toggle-container { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .react-toggle { touch-action: pan-x; display: inline-block; position: relative; cursor: pointer; background-color: transparent; border: 0; padding: 0; user-select: none; }
+        .react-toggle-track { width: 50px; height: 24px; padding: 0; border-radius: 30px; background-color: rgba(255,255,255,0.3); transition: all 0.2s ease; }
+        .react-toggle:hover:not(.react-toggle--disabled) .react-toggle-track { background-color: rgba(255,255,255,0.4); }
+        .react-toggle--checked .react-toggle-track { background-color: #4CAF50; }
+        .react-toggle--checked:hover:not(.react-toggle--disabled) .react-toggle-track { background-color: #45a049; }
+        .react-toggle-thumb { position: absolute; top: 1px; left: 1px; width: 22px; height: 22px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; background-color: #fafafa; transition: all 0.25s ease; }
+        .react-toggle--checked .react-toggle-thumb { left: 27px; border-color: #4CAF50; }
+        .react-toggle-screenreader-only { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
+        .tax-deductions-section { padding: 2em 1.5em; background-color: #f8f9fa; border-top: 1px solid #dee2e6; }
+        .deductions-title { font-size: 1.4rem; margin: 0 0 1em 0; color: #333; }
+        .deductions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 1em; }
+        .deduction-item { display: flex; flex-direction: column; gap: 8px; }
+        .deduction-item label { font-weight: 500; color: #666; font-size: 0.95em; }
+        .deduction-item input[type="number"] { padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; }
+        .deduction-item input[type="number"]:focus { border-color: #3dbaff; outline: none; box-shadow: 0 0 0 3px rgba(61, 186, 255, 0.1); }
+        .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; background-color: white; border: 1px solid #ddd; border-radius: 4px; transition: all 0.2s; }
+        .checkbox-label:hover { border-color: #3dbaff; }
+        .checkbox-label input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .checkbox-label span { font-weight: 500; color: #666; }
+        .deduction-info { margin-top: 1em; padding: 15px; background-color: #e3f2fd; border-left: 4px solid #2196F3; border-radius: 4px; font-size: 0.95em; color: #1976d2; }
+        .deduction-info.error { background-color: #ffebee; border-left-color: #f44336; color: #c62828; }
+        .results-container { padding: 2em 1.5em; }
+        .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .results-column h2 { font-size: 1.5rem; margin: 0 0 1em 0; color: #333; border-bottom: 2px solid #3dbaff; padding-bottom: 0.5em; }
+        .result-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .result-item:last-child { border-bottom: 2px solid #3dbaff; font-weight: bold; font-size: 1.1em; }
+        .result-label { color: #666; font-weight: 500; text-transform: capitalize; }
+        .result-value { font-size: 1.2em; font-weight: 600; color: #333; }
+        .result-item:last-child .result-value { color: #2196F3; }
+        .tax-breakdown { padding: 1.5em; background-color: #f8f9fa; border-top: 1px solid #dee2e6; }
+        .tax-breakdown h2 { font-size: 1.4rem; margin: 0 0 1em 0; color: #333; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .caret { display: inline-block; width: 0; height: 0; border-top: 6px solid #666; border-right: 6px solid transparent; border-left: 6px solid transparent; transition: transform 0.3s; }
+        .caret.open { transform: rotate(180deg); }
+        .tax-table { width: 100%; border-collapse: collapse; background: white; border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .tax-table th, .tax-table td { padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6; }
+        .tax-table th { background-color: #3dbaff; color: white; font-weight: 600; }
+        .tax-table tbody tr:hover { background-color: #f8f9fa; }
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            .results-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .input-row {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .salary-input-container input {
-                width: 160px;
-            }
-
-            .salary-input {
-                padding: 1.5em 1em;
-            }
-        }
-
-        /* Accessibility */
-        .react-toggle:focus .react-toggle-thumb {
-            box-shadow: 0 0 0 3px rgba(61, 186, 255, 0.4);
-        }
-
-        button:focus,
-        input:focus,
-        select:focus {
-            outline: 2px solid #3dbaff;
-            outline-offset: 2px;
+            .container { padding: 10px; }
+            .results-grid, .deductions-grid { grid-template-columns: 1fr; }
+            .input-row { flex-direction: column; gap: 15px; }
+            .salary-input-container input { width: 160px; }
+            .salary-input { padding: 1.5em 1em; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="calculator-wrapper">
-            <!-- Salary Input Section -->
             <div class="salary-input">
                 <div class="input-row">
                     <div class="salary-type-container">
-                        <select id="salaryType" aria-label="Salary period">
-                            <option value="annual">Annual</option>
-                            <option value="monthly">Monthly</option>
-                        </select>
+                        <select id="salaryType"><option value="annual">Annual</option><option value="monthly">Monthly</option></select>
                         <div style="margin-top: 5px; font-size: 0.9em;">Salary Period</div>
                     </div>
                     <div class="salary-input-container">
-                        <input 
-                            type="number" 
-                            id="salaryInput" 
-                            placeholder="30000" 
-                            min="0" 
-                            step="100"
-                            aria-label="Salary amount"
-                        >
+                        <input type="number" id="salaryInput" placeholder="30000" min="0" step="100">
                     </div>
                 </div>
                 <div class="toggles-container">
                     <div class="toggle-container">
                         <label class="react-toggle" id="thirteenthToggle" role="switch" aria-checked="false">
-                            <div class="react-toggle-track"></div>
-                            <div class="react-toggle-thumb"></div>
-                            <input 
-                                class="react-toggle-screenreader-only" 
-                                type="checkbox" 
-                                id="thirteenthCheckbox"
-                                aria-label="Include 13th month salary"
-                            >
+                            <div class="react-toggle-track"></div><div class="react-toggle-thumb"></div>
+                            <input class="react-toggle-screenreader-only" type="checkbox" id="thirteenthCheckbox">
                         </label>
                         <span>13th Month Salary</span>
                     </div>
                     <div class="toggle-container">
                         <label class="react-toggle" id="ataToggle" role="switch" aria-checked="false">
-                            <div class="react-toggle-track"></div>
-                            <div class="react-toggle-thumb"></div>
-                            <input 
-                                class="react-toggle-screenreader-only" 
-                                type="checkbox" 
-                                id="ataCheckbox"
-                                aria-label="Include ATA"
-                            >
+                            <div class="react-toggle-track"></div><div class="react-toggle-thumb"></div>
+                            <input class="react-toggle-screenreader-only" type="checkbox" id="ataCheckbox">
                         </label>
                         <span>Include ATA</span>
                     </div>
                 </div>
             </div>
-
-            <!-- Results Section -->
+            <div class="tax-deductions-section">
+                <h3 class="deductions-title">Tax Deductions (Optional)</h3>
+                <div class="deductions-grid">
+                    <div class="deduction-item">
+                        <label for="householdIncome">Household Income (€)</label>
+                        <input type="number" id="householdIncome" placeholder="0" min="0" step="100">
+                    </div>                   
+                    <div class="deduction-item">
+                        <label for="checkbox-label">&nbsp;</label>
+                        <label class="checkbox-label"><input type="checkbox" id="hasSpouse"><span>Has Spouse</span></label>
+                    </div>
+                    <div class="deduction-item">
+                        <label for="numChildren">Number of Children under 25</label>
+                        <input type="number" id="numChildren" placeholder="0" min="0" max="20" step="1">
+                    </div>
+                    <div class="deduction-item">
+                        <label for="loanInterest">Loan Interest Paid (€)</label>
+                        <input type="number" id="loanInterest" placeholder="0" min="0" step="100">
+                    </div>
+                </div>
+                <div id="deductionInfo" class="deduction-info"></div>
+            </div>
             <div class="results-container">
                 <div class="results-grid">
                     <div class="results-column">
                         <h2>Annual</h2>
-                        <div class="result-item">
-                            <span class="result-label">Gross Salary</span>
-                            <span class="result-value" id="annualGross">€30,000.00</span>
-                        </div>
-                        <div class="result-item" id="annualAtaRow" style="display: none;">
-                            <span class="result-label">ATA</span>
-                            <span class="result-value" id="annualAta">€0.00</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Income Tax</span>
-                            <span class="result-value" id="annualTax">€1,442.80</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Social Insurance</span>
-                            <span class="result-value" id="annualSocial">€2,490.00</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">NHIS (GESY)</span>
-                            <span class="result-value" id="annualGesy">€795.00</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Net Salary</span>
-                            <span class="result-value" id="annualNet">€25,272.20</span>
-                        </div>
+                        <div class="result-item"><span class="result-label">Gross Salary</span><span class="result-value" id="annualGross">€0.00</span></div>
+                        <div class="result-item" id="annualAtaRow" style="display: none;"><span class="result-label">ATA</span><span class="result-value" id="annualAta">€0.00</span></div>
+                        <div class="result-item"><span class="result-label">Income Tax</span><span class="result-value" id="annualTax">€0.00</span></div>
+                        <div class="result-item"><span class="result-label">Social Insurance</span><span class="result-value" id="annualSocial">€0.00</span></div>
+                        <div class="result-item"><span class="result-label">NHIS (GESY)</span><span class="result-value" id="annualGesy">€0.00</span></div>
+                        <div class="result-item"><span class="result-label">Net Salary</span><span class="result-value" id="annualNet">€0.00</span></div>
                     </div>
                     <div class="results-column">
                         <h2>Monthly</h2>
-                        <div class="result-item">
-                            <span class="result-label">Gross Salary</span>
-                            <span class="result-value" id="monthlyGross">€2,500.00</span>
-                        </div>
-                        <div class="result-item" id="monthlyAtaRow" style="display: none;">
-                            <span class="result-label">ATA</span>
-                            <span class="result-value" id="monthlyAta">€0.00</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Income Tax</span>
-                            <span class="result-value" id="monthlyTax">€120.23</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Social Insurance</span>
-                            <span class="result-value" id="monthlySocial">€207.50</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">NHIS (GESY)</span>
-                            <span class="result-value" id="monthlyGesy">€66.25</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Net Salary</span>
-                            <span class="result-value" id="monthlyNet">€2,106.02</span>
-                        </div>
+                        <div class="result-item"><span class="result-label">Gross Salary</span><span class="result-value" id="monthlyGross">€0.00</span></div>
+                        <div class="result-item" id="monthlyAtaRow" style="display: none;"><span class="result-label">ATA</span><span class="result-value" id="monthlyAta">€0.00</span></div>
+                        <div class="result-item"><span class="result-label">Income Tax</span><span class="result-value" id="monthlyTax">€0.00</span></div>
+                        <div class="result-item"><span class="result-label">Social Insurance</span><span class="result-value" id="monthlySocial">€0.00</span></div>
+                        <div class="result-item"><span class="result-label">NHIS (GESY)</span><span class="result-value" id="monthlyGesy">€0.00</span></div>
+                        <div class="result-item"><span class="result-label">Net Salary</span><span class="result-value" id="monthlyNet">€0.00</span></div>
                     </div>
                 </div>
             </div>
-
-            <!-- Tax Breakdown Section -->
             <div class="tax-breakdown">
-                <h2 id="taxBreakdownToggle">
-                    Tax Breakdown
-                    <span class="caret open"></span>
-                </h2>
+                <h2 id="taxBreakdownToggle">Tax Breakdown<span class="caret open"></span></h2>
                 <div id="taxBreakdownContent">
                     <table class="tax-table">
-                        <thead>
-                            <tr>
-                                <th>Income Range Start</th>
-                                <th>Income Range End</th>
-                                <th>Tax Rate</th>
-                                <th>Tax Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody id="taxBreakdownTable">
-                            <tr>
-                                <td>€0</td>
-                                <td>€19,500</td>
-                                <td>0%</td>
-                                <td>€0.00</td>
-                            </tr>
-                            <tr>
-                                <td>€19,501</td>
-                                <td>€28,000</td>
-                                <td>20%</td>
-                                <td>€1,442.80</td>
-                            </tr>
-                        </tbody>
+                        <thead><tr><th>Income Range Start</th><th>Income Range End</th><th>Tax Rate</th><th>Tax Amount</th></tr></thead>
+                        <tbody id="taxBreakdownTable"></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-
     <script>
-        // Tax calculation constants (2025 rates)
+        const $ = id => document.getElementById(id);
+        
         const TAX_BRACKETS = [
-            { from: 0, to: 19500, rate: 0 },
-            { from: 19501, to: 28000, rate: 20 },
-            { from: 28001, to: 36300, rate: 25 },
-            { from: 36301, to: 60000, rate: 30 },
-            { from: 60001, to: Infinity, rate: 35 }
+            { from: 0,     to: 22000,    rate: 0 },
+            { from: 22001, to: 32000,    rate: 20 },
+            { from: 32001, to: 42000,    rate: 25 },
+            { from: 42001, to: 72000,    rate: 30 },
+            { from: 72001, to: Infinity, rate: 35 }
         ];
 
-        const GESY_RATE = 2.65; // %
-        const GESY_YEARLY_CAP = 180000; // €
+        const GESY_RATE = 2.65,
+              GESY_YEARLY_CAP = 180000,
+              SOCIAL_INSURANCE_RATE = 8.9,
+              SOCIAL_INSURANCE_MONTHLY_CAP = 5551,
+              ATA_RATE = 1.25;
 
-        const SOCIAL_INSURANCE_RATE = 8.9; // %
-        const SOCIAL_INSURANCE_MONTHLY_CAP = 5551; // € (2025)
-
-        const ATA_RATE = 1.25; // %
-
-        // Application state
         class TaxCalculator {
             constructor() {
                 this.salaryAmount = 30000;
                 this.isAnnual = true;
                 this.hasThirteenthMonth = false;
                 this.hasAta = false;
+                this.householdIncome = 0;
+                this.loanInterest = 0;
+                this.hasSpouse = false;
+                this.numChildren = 0;
                 this.initializeEventListeners();
-                this.calculate();
+                this.calculate()
             }
 
             initializeEventListeners() {
-                // Salary input
-                const salaryInput = document.getElementById('salaryInput');
-                salaryInput.addEventListener('input', (e) => {
+                $('salaryInput').addEventListener('input', e => {
                     this.salaryAmount = parseFloat(e.target.value) || 0;
-                    this.calculate();
+                    this.calculate()
                 });
 
-                // Salary type selector
-                const salaryType = document.getElementById('salaryType');
-                salaryType.addEventListener('change', (e) => {
+                $('salaryType').addEventListener('change', e => {
                     this.isAnnual = e.target.value === 'annual';
-                    this.calculate();
+                    this.calculate()
                 });
-
-                // 13th month toggle
-                const thirteenthToggle = document.getElementById('thirteenthToggle');
-                const thirteenthCheckbox = document.getElementById('thirteenthCheckbox');
+               
+                $('householdIncome').addEventListener('input', e => {
+                    this.householdIncome = parseFloat(e.target.value) || 0;
+                    this.calculate()
+                });
                 
-                thirteenthToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggleThirteenthMonth();
+                $('loanInterest').addEventListener('input', e => {
+                    this.loanInterest = parseFloat(e.target.value) || 0;
+                    this.calculate()
                 });
-
-                thirteenthCheckbox.addEventListener('change', () => {
-                    this.toggleThirteenthMonth();
-                });
-
-                // ATA toggle
-                const ataToggle = document.getElementById('ataToggle');
-                const ataCheckbox = document.getElementById('ataCheckbox');
                 
-                ataToggle.addEventListener('click', (e) => {
+                $('hasSpouse').addEventListener('change', e => {
+                    this.hasSpouse = e.target.checked;
+                    this.calculate()
+                });
+                
+                $('numChildren').addEventListener('input', e => {
+                    this.numChildren = parseInt(e.target.value) || 0;
+                    this.calculate()
+                })
+
+                $('thirteenthToggle').addEventListener('click', e => {
                     e.preventDefault();
-                    this.toggleAta();
+                    this.toggleThirteenthMonth()
+                });
+                
+                $('thirteenthCheckbox').addEventListener('change', () => this.toggleThirteenthMonth());
+                
+                $('ataToggle').addEventListener('click', e => {
+                    e.preventDefault();
+                    this.toggleAta()
                 });
 
-                ataCheckbox.addEventListener('change', () => {
-                    this.toggleAta();
-                });
+                $('ataCheckbox').addEventListener('change', () => this.toggleAta());
+                
+                $('taxBreakdownToggle').addEventListener('click', () => this.toggleTaxBreakdown());
 
-                // Tax breakdown toggle
-                const taxBreakdownToggle = document.getElementById('taxBreakdownToggle');
-                taxBreakdownToggle.addEventListener('click', () => {
-                    this.toggleTaxBreakdown();
-                });
+            }
+
+            renderToggle(toggleEl, checkboxEl, value) {
+                toggleEl.classList.toggle('react-toggle--checked', value);
+                toggleEl.setAttribute('aria-checked', value);
+                checkboxEl.checked = value;
             }
 
             toggleThirteenthMonth() {
                 this.hasThirteenthMonth = !this.hasThirteenthMonth;
-                
-                const toggle = document.getElementById('thirteenthToggle');
-                const checkbox = document.getElementById('thirteenthCheckbox');
-                
-                if (this.hasThirteenthMonth) {
-                    toggle.classList.add('react-toggle--checked');
-                    toggle.setAttribute('aria-checked', 'true');
-                    checkbox.checked = true;
-                } else {
-                    toggle.classList.remove('react-toggle--checked');
-                    toggle.setAttribute('aria-checked', 'false');
-                    checkbox.checked = false;
-                }
-                
-                this.calculate();
+                this.renderToggle($('thirteenthToggle'), $('thirteenthCheckbox'), this.hasThirteenthMonth);
+                this.calculate()
             }
 
             toggleAta() {
-                this.hasAta = !this.hasAta;
-                
-                const toggle = document.getElementById('ataToggle');
-                const checkbox = document.getElementById('ataCheckbox');
-                
-                if (this.hasAta) {
-                    toggle.classList.add('react-toggle--checked');
-                    toggle.setAttribute('aria-checked', 'true');
-                    checkbox.checked = true;
-                } else {
-                    toggle.classList.remove('react-toggle--checked');
-                    toggle.setAttribute('aria-checked', 'false');
-                    checkbox.checked = false;
-                }
-                
-                this.calculate();
+                this.hasAta = !this.hasAta;                                
+                this.renderToggle($('ataToggle'), $('ataCheckbox'), this.hasAta);                
+                this.calculate()
             }
 
             toggleTaxBreakdown() {
-                const content = document.getElementById('taxBreakdownContent');
-                const caret = document.querySelector('.caret');
-                
+                const content = $('taxBreakdownContent'),
+                      caret = document.querySelector('.caret');
+
                 if (content.style.display === 'none') {
                     content.style.display = 'block';
-                    caret.classList.add('open');
+                    caret.classList.add('open')
                 } else {
                     content.style.display = 'none';
-                    caret.classList.remove('open');
+                    caret.classList.remove('open')
                 }
             }
 
@@ -588,7 +274,7 @@
                     const taxableInBracket = Math.min(annualSalary, bracket.to) - bracket.from + 1;
                     const taxInBracket = (taxableInBracket * bracket.rate) / 100;
                     
-                    if (taxInBracket > 0) {
+                    if (taxInBracket >= 0) {
                         totalTax += taxInBracket;
                         taxBreakdown.push({
                             from: bracket.from,
@@ -617,6 +303,38 @@
                 return (annualSalary * ATA_RATE) / 100;
             }
 
+            isEligibleForDeductions() {
+                const income = this.householdIncome || 0;
+
+                return (!this.hasSpouse && this.numChildren === 0      && income <=  40000)
+                    || ( this.hasSpouse                                && income <=  90000)
+                    || (this.numChildren >= 1 && this.numChildren <= 2 && income <= 100000)
+                    || (this.numChildren >= 3 && this.numChildren <= 4 && income <= 150000)
+                    || (this.numChildren >= 5                          && income <= 200000);                
+            }
+
+            calculateTaxDeductions() {
+                if (!this.isEligibleForDeductions()) return {
+                    total: 0,
+                    loanInterest: 0,
+                    children: 0,
+                    eligible: false
+                };
+                const loanInterestDeductions = Math.min(this.loanInterest, 2000);
+                
+                let childDeductions = 0;                
+                if (this.numChildren >= 1) childDeductions += 1000;
+                if (this.numChildren >= 2) childDeductions += 1250;
+                if (this.numChildren >= 3) childDeductions += (this.numChildren - 2) * 1500;
+
+                return {
+                    total: loanInterestDeductions + childDeductions,
+                    loanInterest: loanInterestDeductions,
+                    children: childDeductions,
+                    eligible: true
+                }
+            }
+
             calculate() {
 				let months = this.hasThirteenthMonth ? 13 : 12;
                 // Convert to annual salary
@@ -625,8 +343,11 @@
 				
 				let effectiveAnnualSalary = annualSalary + ataAmount;
 
+                const d = this.calculateTaxDeductions();
+                const taxableIncome = Math.max(0, effectiveAnnualSalary - d.total);
+
                 // Calculate deductions
-                const taxResult = this.calculateTax(effectiveAnnualSalary);
+                const taxResult = this.calculateTax(taxableIncome);
                 const socialInsuranceAmount = this.calculateSocialInsurance(effectiveAnnualSalary);
                 const gesyAmount = this.calculateGesy(effectiveAnnualSalary);
                 
@@ -638,74 +359,86 @@
                 // Update display
                 this.updateResults(annualSalary, taxResult.totalTax, socialInsuranceAmount, gesyAmount, ataAmount, annualNet, months);
                 this.updateTaxBreakdown(taxResult.taxBreakdown);
+                this.updateDeductionInfo(d)
             }
 
-            updateResults(annualGross, annualTax, annualSocial, annualGesy, annualAta, annualNet, months) {
-                // Annual values
-                document.getElementById('annualGross').textContent = this.formatCurrency(annualGross);
-                document.getElementById('annualTax').textContent = this.formatCurrency(annualTax);
-                document.getElementById('annualSocial').textContent = this.formatCurrency(annualSocial);
-                document.getElementById('annualGesy').textContent = this.formatCurrency(annualGesy);
-                document.getElementById('annualNet').textContent = this.formatCurrency(annualNet);
+            updateResults(annualGross, annualTax, annualSocial, annualGesy, annualAta, annualNet, months) {                
+                $('annualGross').textContent = this.formatCurrency(annualGross);
+                $('annualTax').textContent = this.formatCurrency(annualTax);
+                $('annualSocial').textContent = this.formatCurrency(annualSocial);
+                $('annualGesy').textContent = this.formatCurrency(annualGesy);
+                $('annualNet').textContent = this.formatCurrency(annualNet);
                 
-                // ATA display logic
-                const annualAtaRow = document.getElementById('annualAtaRow');
-                const monthlyAtaRow = document.getElementById('monthlyAtaRow');
+                const annualAtaRow = $('annualAtaRow'),
+                      monthlyAtaRow =$('monthlyAtaRow');
                 
                 if (this.hasAta) {
-                    document.getElementById('annualAta').textContent = this.formatCurrency(annualAta);
-                    document.getElementById('monthlyAta').textContent = this.formatCurrency(annualAta / months);
+                    $('annualAta').textContent = this.formatCurrency(annualAta);
+                    $('monthlyAta').textContent = this.formatCurrency(annualAta / months);
                     annualAtaRow.style.display = 'flex';
-                    monthlyAtaRow.style.display = 'flex';
+                    monthlyAtaRow.style.display = 'flex'
                 } else {
                     annualAtaRow.style.display = 'none';
-                    monthlyAtaRow.style.display = 'none';
+                    monthlyAtaRow.style.display = 'none'
                 }
                 
-                // Monthly values
-                document.getElementById('monthlyGross').textContent = this.formatCurrency(annualGross / months);
-                document.getElementById('monthlyTax').textContent = this.formatCurrency(annualTax / months);
-                document.getElementById('monthlySocial').textContent = this.formatCurrency(annualSocial / months);
-                document.getElementById('monthlyGesy').textContent = this.formatCurrency(annualGesy / months);
-                document.getElementById('monthlyNet').textContent = this.formatCurrency(annualNet / months);
+                $('monthlyGross').textContent = this.formatCurrency(annualGross / months);
+                $('monthlyTax').textContent = this.formatCurrency(annualTax / months);
+                $('monthlySocial').textContent = this.formatCurrency(annualSocial / months);
+                $('monthlyGesy').textContent = this.formatCurrency(annualGesy / months);
+                $('monthlyNet').textContent = this.formatCurrency(annualNet / months)
             }
-
+            
             updateTaxBreakdown(taxBreakdown) {
-                const tbody = document.getElementById('taxBreakdownTable');
-                tbody.innerHTML = '';
-                
+                const tableBody = $('taxBreakdownTable');                            
+
+                tableBody.innerHTML = '';
                 if (taxBreakdown.length === 0) {
                     const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>€0</td>
-                        <td>€19,500</td>
-                        <td>0%</td>
-                        <td>€0.00</td>
-                    `;
-                    tbody.appendChild(row);
-                    return;
+                    row.innerHTML = '<td>€0</td><td>€22,000</td><td>0%</td><td>€0.00</td>';
+                    tableBody.appendChild(row);
+                    return
                 }
-                
-                for (const bracket of taxBreakdown) {
+
+                const tableRows = document.createDocumentFragment();
+                for (const level of taxBreakdown) {
                     const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>€${bracket.from.toLocaleString()}</td>
-                        <td>${bracket.to === Infinity ? '€∞' : '€' + bracket.to.toLocaleString()}</td>
-                        <td>${bracket.rate}%</td>
-                        <td>${this.formatCurrency(bracket.tax)}</td>
-                    `;
-                    tbody.appendChild(row);
+                    row.innerHTML = `<td>€${level.from.toLocaleString()}</td><td>${level.to===Infinity?'€∞':'€'+level.to.toLocaleString()}</td><td>${level.rate}%</td><td>${this.formatCurrency(level.tax)}</td>`;
+                    tableRows.appendChild(row);
                 }
+                tableBody.appendChild(tableRows)
             }
 
-            formatCurrency(amount) {
-                return '€' + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            formatCurrency(a) {
+                return '€' + a.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+            }
+
+            updateDeductionInfo(d) {
+                const i = $('deductionInfo');
+                if (!this.householdIncome && !this.loanInterest && !this.hasSpouse && this.numChildren === 0) {
+                    i.innerHTML = '';
+                    return
+                }
+                if (!d.eligible) {
+                    i.className = 'deduction-info error';
+                    i.innerHTML = '<strong>Not Eligible:</strong> Your household income exceeds the eligibility threshold for the selected family situation.';
+                    return
+                }
+                if (d.total === 0) {
+                    i.className = 'deduction-info';
+                    i.innerHTML = '<strong>Eligible for deductions:</strong> Enter loan interest paid and/or number of children to calculate deductions.';
+                    return
+                }
+                let m = `<strong>Tax Deductions Applied:</strong> ${this.formatCurrency(d.total)} excluded from taxable income.<br>`;
+                if (d.loanInterest > 0) m += `• Loan Interest: ${this.formatCurrency(d.loanInterest)}<br>`;
+                if (d.children > 0) m += `• Children Deduction (${this.numChildren} child${this.numChildren>1?'ren':''}): ${this.formatCurrency(d.children)}`;
+                i.className = 'deduction-info';
+                i.innerHTML = m
             }
         }
 
-        // Initialize the calculator when the page loads
         document.addEventListener('DOMContentLoaded', () => {
-            new TaxCalculator();
+            new TaxCalculator()
         });
     </script>
 </body>
